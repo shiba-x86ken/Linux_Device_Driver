@@ -1,0 +1,13 @@
+SRCS	:= #file_name.c
+obj-m	:= $(SRCS:.c=.o)
+# ccflags-y  := -Wno-unused-variable
+
+BUILD_DIR := /lib/modules/$(shell uname -r)/build
+all:
+	/bin/echo -e "\\033c"
+	make -C $(BUILD_DIR) M=$(PWD) modules
+clean:
+	make -C $(BUILD_DIR) M=$(PWD) clean
+install:
+	make -C $(BUILD_DIR) M=$(PWD) modules_install
+	depmod -a
