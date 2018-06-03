@@ -1,4 +1,3 @@
-/* 1604861 2EP4-27 Äú±Œ¤–è */
 // coding:shift JIS
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,12 +10,12 @@
 #include <errno.h>
 
 #define N 100
-// CPU‚Ì‰·“x‚ª‘‚«‚Ü‚ê‚Ä‚¢‚éƒVƒXƒeƒ€ƒtƒ@ƒCƒ‹PATH
+// CPUã®æ¸©åº¦ãŒæ›¸ãè¾¼ã¾ã‚Œã¦ã„ã‚‹ã‚·ã‚¹ãƒ†ãƒ ãƒ•ã‚¡ã‚¤ãƒ«PATH
 #define CPU_TEMP_FILE "/sys/class/thermal/thermal_zone0/temp"
-// waching_cpu_temp-driver‚ÌƒfƒoƒCƒX‘®«PATH
+// waching_cpu_temp-driverã®ãƒ‡ãƒã‚¤ã‚¹å±æ€§PATH
 #define CPU_ISSUE_DRIVER "/sys/class/CPU_TEMP/cpu_temp/cpu_issue"
 
-// g‚¢•û
+// ä½¿ã„æ–¹
 void usage() {
     puts("You must setting warning cpu temperature.");
     puts("Usage:");
@@ -25,30 +24,30 @@ void usage() {
     exit(0);
 }
 
-// STOPƒVƒOƒiƒ‹‚Ìƒvƒƒgƒ^ƒCƒvéŒ¾
+// STOPã‚·ã‚°ãƒŠãƒ«ã®ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€
 void proc_stop();
 
-int main(int argc, char const *argv[]) { // ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ˆø”‚©‚çİ’è‰·“x‚ğó‚¯æ‚é
-    int cpu_temp_fd, cpu_issue_fd; // ƒtƒ@ƒCƒ‹ƒfƒBƒXƒNƒŠƒvƒ^
-    char cpu_temp_buf[N] = {'\0'}; // cpu‚Ì‰·“x‚ğŠi”[‚·‚éƒoƒbƒtƒ@
-    int cpu_temp; // cpu‚Ì‰·“x‚ğŠi”[
-    int setting_cpu_temp; // İ’è‰·“x
-    char temp_buf[N] = {'\0'}; // read()—p‚Ìƒoƒbƒtƒ@
+int main(int argc, char const *argv[]) { // ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³å¼•æ•°ã‹ã‚‰è¨­å®šæ¸©åº¦ã‚’å—ã‘å–ã‚‹
+    int cpu_temp_fd, cpu_issue_fd; // ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿
+    char cpu_temp_buf[N] = {'\0'}; // cpuã®æ¸©åº¦ã‚’æ ¼ç´ã™ã‚‹ãƒãƒƒãƒ•ã‚¡
+    int cpu_temp; // cpuã®æ¸©åº¦ã‚’æ ¼ç´
+    int setting_cpu_temp; // è¨­å®šæ¸©åº¦
+    char temp_buf[N] = {'\0'}; // read()ç”¨ã®ãƒãƒƒãƒ•ã‚¡
 
-    // İ’è‰·“x‚ğó‚¯æ‚ê‚È‚¯‚ê‚Îg—p•û–@‚ğ•\¦
+    // è¨­å®šæ¸©åº¦ã‚’å—ã‘å–ã‚Œãªã‘ã‚Œã°ä½¿ç”¨æ–¹æ³•ã‚’è¡¨ç¤º
     if (argc < 2) {
         usage();
     }
 
     setting_cpu_temp = atoi(argv[1]);
 
-    signal(SIGTSTP,proc_stop); // STOPƒVƒOƒiƒ‹ƒnƒ“ƒhƒ‰‚Ì“o˜^
+    signal(SIGTSTP,proc_stop); // STOPã‚·ã‚°ãƒŠãƒ«ãƒãƒ³ãƒ‰ãƒ©ã®ç™»éŒ²
 
-    printf("setting success : %d \n\n", setting_cpu_temp);
+    printf("setting success : %d â„ƒ\n\n", setting_cpu_temp);
     puts("-*- CPU watcher start -*-");
     puts("\e[41mSTOP : ctrl-Z\e[m\n");
 
-    usleep(5000000); // 5•b‘Ò‚Â
+    usleep(5000000); // 5ç§’å¾…ã¤
 
     while (1) {
         cpu_temp_fd = open(CPU_TEMP_FILE, O_RDONLY);
@@ -57,29 +56,29 @@ int main(int argc, char const *argv[]) { // ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ˆø”‚©‚çİ’è‰·“x‚ğó‚¯
         cpu_temp_buf[strlen(cpu_temp_buf) - 1]='\0';
         cpu_temp = atoi(cpu_temp_buf) / 1000;
 
-            // cpu‚Ì‰·“x‚ªİ’è‰·“x‚æ‚è‚à‚‚­‚È‚Á‚½‚çDDD
+            // cpuã®æ¸©åº¦ãŒè¨­å®šæ¸©åº¦ã‚ˆã‚Šã‚‚é«˜ããªã£ãŸã‚‰ï¼ï¼ï¼
             if (setting_cpu_temp <= cpu_temp) {
-                printf("\e[31mWarning!! : %d \e[m\n\n", cpu_temp);
+                printf("\e[31mWarning!! : %d â„ƒ\e[m\n\n", cpu_temp);
 
-                // waching_cpu_temp-driver‚ÌƒfƒoƒCƒX‘®«‚ğopen
+                // waching_cpu_temp-driverã®ãƒ‡ãƒã‚¤ã‚¹å±æ€§ã‚’open
                 cpu_issue_fd = open(CPU_ISSUE_DRIVER, O_RDONLY);
                     int temp_size = read(cpu_issue_fd, temp_buf, N);
                     close(cpu_issue_fd);
                 }else{
-                printf("CPU-TEMP : %d \n\n", cpu_temp);
+                printf("CPU-TEMP : %d â„ƒ\n\n", cpu_temp);
                 close(cpu_temp_fd);
             }
 
             close(cpu_temp_fd);
             close(cpu_issue_fd);
 
-            usleep(500000); // 5•b‘Ò‚Â
+            usleep(500000); // 5ç§’å¾…ã¤
         }
 
     return 0;
 }
 
-// ctrl-Z‚ÅSTOPƒVƒOƒiƒ‹‚ğ‘—M
+// ctrl-Zã§STOPã‚·ã‚°ãƒŠãƒ«ã‚’é€ä¿¡
 void proc_stop() {
   	printf("\n");
     puts("End...\n");
